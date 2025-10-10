@@ -1,79 +1,17 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>联信资匿名意见箱</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600&display=swap" rel="stylesheet" />
-  <style>
-    header, h1:first-of-type {
-      display: none !important;
-    }
-    body {
-      font-family: 'Noto Sans SC', sans-serif;
-      background: radial-gradient(circle at top, #0e1630, #020617);
-      color: #fff;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 600px;
-      margin: 80px auto;
-      background: rgba(255, 255, 255, 0.08);
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    }
-    h2 {
-      text-align: center;
-      font-weight: 600;
-      margin-bottom: 25px;
-    }
-    label {
-      display: block;
-      margin-top: 15px;
-      margin-bottom: 5px;
-      font-weight: 500;
-    }
-    select, textarea, input[type="file"] {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      font-size: 14px;
-      margin-bottom: 15px;
-    }
-    textarea {
-      resize: vertical;
-      min-height: 100px;
-    }
-    button {
-      background-color: #2563eb;
-      border: none;
-      color: white;
-      padding: 12px 20px;
-      width: 100%;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    button:hover {
-      background-color: #1d4ed8;
-    }
-    .footer {
-      text-align: center;
-      color: #888;
-      font-size: 14px;
-      margin: 20px 0;
-    }
-  </style>
+  <link rel="stylesheet" href="assets/styles.css">
 </head>
-
 <body>
   <div class="container">
-    <h2>联信资匿名意见箱</h2>
-    <form id="feedbackForm">
+    <h1>📩 联信资匿名意见箱</h1>
+    <p class="desc">完全匿名 · 直达 Outlook · 支持上传证据</p>
+
+    <form id="feedback-form">
       <label for="category">举报内容分类</label>
       <select id="category" name="category" required>
         <option value="">请选择分类</option>
@@ -85,60 +23,70 @@
       </select>
 
       <label for="message">举报 / 意见内容</label>
-      <textarea id="message" name="message" placeholder="请尽量详细描述事实、时间、地点、涉及人员与影响…" maxlength="1500" required></textarea>
+      <textarea id="message" name="message" placeholder="请尽量详细描述事实、时间、地点、涉及人员等信息..." maxlength="1500" required></textarea>
 
-      <label for="evidence">提交证据（可选，单个≤5MB，可多选）</label>
-      <input type="file" id="evidence" name="evidence" multiple />
+      <label for="evidence">提交证据（可选，单个 ≤ 5MB，可多选）</label>
+      <input type="file" id="evidence" name="evidence" multiple>
 
-      <p>
-        <input type="checkbox" id="confirm" required />
+      <label class="checkbox">
+        <input type="checkbox" required>
         我已知悉并确认：本表单不采集姓名、邮箱或登录信息，建议不要在内容中留下可识别个人的线索。
-      </p>
+      </label>
 
       <button type="submit">匿名提交</button>
-      <p id="status" style="margin-top: 15px; text-align: center;"></p>
     </form>
+
+    <p class="footer">© 2025 联信资集团 · 保密与合规</p>
   </div>
 
-  <div class="footer">© 2025 联信资集团 · 保密与合规</div>
-
-  <!-- EmailJS -->
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
-    (function() {
-      emailjs.init("Vf3g58_uwsuIfMxCI");
+    (function(){
+      emailjs.init("Vf3g58_uwsuIfMxCI"); // ← 这里填你的 Public Key
     })();
 
-    const form = document.getElementById("feedbackForm");
-    const status = document.getElementById("status");
+    const serviceID = "service_0nbyy1m"; // ← 你的 Service ID
+    const templateID = "template_la7d6sb"; // ← 你的 Template ID
 
-    form.addEventListener("submit", function(e) {
+    document.getElementById('feedback-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      status.innerText = "正在提交，请稍候…";
 
-      const serviceID = "service_0nbyy1m";
-      const templateID = "template_la7d6sb";
+      const btn = e.target.querySelector("button");
+      btn.disabled = true;
+      btn.textContent = "正在提交...";
 
-      const files = document.getElementById("evidence").files;
-      let evidenceList = [];
-      for (let i = 0; i < files.length; i++) {
-        evidenceList.push(files[i].name);
+      const files = e.target.evidence.files;
+      let fileLinks = [];
+
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await fetch("https://api.emailjs.com/api/v1.0/files/upload", {
+          method: "POST",
+          body: formData
+        });
+        const data = await res.json();
+        fileLinks.push(data.url);
       }
 
-      const params = {
-        category: form.category.value,
-        message: form.message.value,
-        evidence: evidenceList.length ? evidenceList.join(", ") : "无"
+      const formData = {
+        category: e.target.category.value,
+        message: e.target.message.value,
+        evidence: fileLinks.join(", ")
       };
 
-      emailjs.send(serviceID, templateID, params)
+      emailjs.send(serviceID, templateID, formData)
         .then(() => {
-          status.innerText = "✅ 已成功提交！感谢您的匿名反馈。";
-          form.reset();
+          alert("✅ 举报已匿名提交成功！");
+          e.target.reset();
         })
-        .catch(err => {
+        .catch((err) => {
           console.error(err);
-          status.innerText = "❌ 提交失败，请稍后重试。";
+          alert("❌ 提交失败，请稍后再试。");
+        })
+        .finally(() => {
+          btn.disabled = false;
+          btn.textContent = "匿名提交";
         });
     });
   </script>
