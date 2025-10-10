@@ -6,7 +6,6 @@
   <title>联信资匿名意见箱</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    header, h1:first-of-type { display: none !important; }
     body {
       font-family: 'Noto Sans SC', sans-serif;
       background: radial-gradient(circle at top, #0e1630, #020617);
@@ -17,76 +16,35 @@
     .container {
       max-width: 600px;
       margin: 80px auto;
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255,255,255,0.08);
       padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
     h2 {
       text-align: center;
       font-weight: 600;
       margin-bottom: 25px;
     }
-    label {
-      display: block;
-      margin-top: 15px;
-      margin-bottom: 5px;
-      font-weight: 500;
+    label { display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 500; }
+    select, textarea, input[type="file"] {
+      width: 100%; padding: 10px; border-radius: 6px; border: none; font-size: 14px; margin-bottom: 15px;
     }
-    select, textarea {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      font-size: 14px;
-      margin-bottom: 15px;
-    }
-    textarea {
-      resize: vertical;
-      min-height: 100px;
-    }
+    textarea { resize: vertical; min-height: 100px; }
     button {
-      background-color: #2563eb;
-      border: none;
-      color: white;
-      padding: 12px 20px;
-      width: 100%;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.2s;
+      background-color: #2563eb; border: none; color: white;
+      padding: 12px 20px; width: 100%; font-size: 16px;
+      border-radius: 6px; cursor: pointer; transition: 0.2s;
     }
-    button:hover {
-      background-color: #1d4ed8;
-    }
-    .footer {
-      text-align: center;
-      color: #888;
-      font-size: 14px;
-      margin: 20px 0;
-    }
+    button:hover { background-color: #1d4ed8; }
+    .footer { text-align: center; color: #888; font-size: 14px; margin: 20px 0; }
   </style>
 </head>
 
 <body>
   <div class="container">
     <h2>联信资匿名意见箱</h2>
-
-    <!-- Web3Forms 免费方案 -->
-    <form action="https://api.web3forms.com/submit" method="POST" id="feedbackForm">
-      <!-- 你的 Web3Forms Access Key（从 dashboard.web3forms.com 复制） -->
-      <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY" />
-
-      <!-- 邮件标题和来源 -->
-      <input type="hidden" name="subject" value="联信资匿名意见箱 - 新举报" />
-      <input type="hidden" name="from_name" value="联信资匿名意见箱" />
-
-      <!-- 提交后跳转的感谢页 -->
-      <input type="hidden" name="redirect" value="https://fort888.github.io/lianxinzi-feedback/thanks.html" />
-
-      <!-- 隐藏的防垃圾字段 -->
-      <input type="checkbox" name="botcheck" class="hidden" style="display:none">
-
+    <form id="feedbackForm">
       <label for="category">举报内容分类</label>
       <select id="category" name="category" required>
         <option value="">请选择分类</option>
@@ -100,29 +58,81 @@
       <label for="message">举报 / 意见内容</label>
       <textarea id="message" name="message" placeholder="请尽量详细描述事实、时间、地点、涉及人员与影响…" maxlength="1500" required></textarea>
 
+      <label for="evidence">提交证据（可选，单个 ≤5MB，可多选）</label>
+      <input type="file" id="evidence" name="evidence" multiple accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.zip" />
+
       <p>
         <input type="checkbox" id="confirm" required />
-        我已知悉并确认：本表单不采集姓名、邮箱或登录信息，建议不要在内容中留下可识别个人的线索。
+        我已知悉并确认：本表单不采集姓名、邮箱或登录信息。
       </p>
 
       <button type="submit" id="submitBtn">匿名提交</button>
+      <p id="status" style="margin-top: 15px; text-align: center;"></p>
     </form>
   </div>
 
   <div class="footer">© 2025 联信资集团 · 保密与合规</div>
 
-  <!-- 简单的按钮状态提示 -->
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
-    const form = document.getElementById('feedbackForm');
-    const btn = document.getElementById('submitBtn');
-    form.addEventListener('submit', () => {
+    (function() {
+      emailjs.init("Vf3g58_uwsuIfMxCI"); // ← 你的 Public Key
+    })();
+
+    const serviceID = "service_0nbyy1m"; // ← 你的 Service ID
+    const templateID = "template_la7d6sb"; // ← 你的 Template ID
+
+    const form = document.getElementById("feedbackForm");
+    const status = document.getElementById("status");
+    const btn = document.getElementById("submitBtn");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
       btn.disabled = true;
-      btn.textContent = '正在提交…';
-      setTimeout(() => {
-        btn.disabled = false;
-        btn.textContent = '匿名提交';
-      }, 6000);
+      btn.textContent = "正在提交…";
+      status.textContent = "请稍候，正在上传…";
+
+      const files = document.getElementById("evidence").files;
+      let fileBase64List = [];
+
+      for (let file of files) {
+        const base64 = await toBase64(file);
+        fileBase64List.push({
+          filename: file.name,
+          content: base64.split(",")[1]
+        });
+      }
+
+      const params = {
+        category: form.category.value,
+        message: form.message.value,
+        attachments: fileBase64List,
+      };
+
+      emailjs.send(serviceID, templateID, params)
+        .then(() => {
+          status.textContent = "✅ 举报已成功匿名提交！";
+          form.reset();
+        })
+        .catch((err) => {
+          console.error(err);
+          status.textContent = "❌ 提交失败，请稍后重试。";
+        })
+        .finally(() => {
+          btn.disabled = false;
+          btn.textContent = "匿名提交";
+        });
     });
+
+    function toBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+      });
+    }
   </script>
 </body>
 </html>
