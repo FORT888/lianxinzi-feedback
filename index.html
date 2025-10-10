@@ -1,81 +1,136 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>联信资匿名意见箱</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    header, h1:first-of-type { display: none !important; }
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+      background: radial-gradient(circle at top, #0e1630, #020617);
+      color: #fff;
+      margin: 0; padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 80px auto;
+      background: rgba(255,255,255,0.08);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    h2 {
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 25px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    select, textarea, input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 14px;
+      margin-bottom: 15px;
+    }
+    textarea { resize: vertical; min-height: 100px; }
+    button {
+      background-color: #2563eb;
+      border: none;
+      color: white;
+      padding: 12px 20px;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover { background-color: #1d4ed8; }
+    .footer {
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+      margin: 20px 0;
+    }
+  </style>
 </head>
+
 <body>
-  <main class="page">
-    <header class="header">
-      <div class="logo">
-        <svg viewBox="0 0 24 24" class="shield" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.6-8 11-4.6-1.4-8-6-8-11V5l8-3zM7.5 10.5h9m-9 3h5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        <span>联信资匿名意见箱</span>
-      </div>
-      <p class="subtitle">完全匿名 · 直达 Outlook · 支持提交证据</p>
-    </header>
+  <div class="container">
+    <h2>联信资匿名意见箱</h2>
 
-    <section class="card">
-      <form id="feedback-form" enctype="multipart/form-data">
-        <input type="hidden" id="EMAILJS_PUBLIC_KEY" value="Vf3g58_uwsuIfMxCI" />
-        <input type="hidden" id="EMAILJS_SERVICE_ID" value="service_0nbyy1m" />
-        <input type="hidden" id="EMAILJS_TEMPLATE_ID" value="template_la7d6sb" />
+    <!-- ✅ 使用 Web3Forms 表单 -->
+    <form action="https://api.web3forms.com/submit" method="POST" enctype="multipart/form-data" id="feedbackForm">
+      <!-- 你的 Web3Forms Access Key（请勿泄露） -->
+      <input type="hidden" name="access_key" value="3f6dc6a5-9766-48b9-8e3f-43dca5b366d8">
 
-        <div class="field">
-          <label for="category">举报内容分类</label>
-          <select id="category" name="category" required>
-            <option value="">请选择分类</option>
-            <option>公司管理</option>
-            <option>团队协作</option>
-            <option>工作环境</option>
-            <option>福利制度</option>
-            <option>其他</option>
-          </select>
-          <small class="error" data-for="category"></small>
-        </div>
+      <!-- 邮件主题与来源 -->
+      <input type="hidden" name="subject" value="联信资匿名意见箱 - 新举报">
+      <input type="hidden" name="from_name" value="联信资匿名意见箱">
 
-        <div class="field">
-          <label for="message">举报 / 意见内容</label>
-          <textarea id="message" name="message" rows="7" placeholder="请尽量清晰地描述事实、时间、地点、涉及人员与影响……" required></textarea>
-          <div class="help-row">
-            <small id="charCount">0/1500</small>
-            <small class="error" data-for="message"></small>
-          </div>
-        </div>
+      <!-- 成功后跳转到感谢页 -->
+      <input type="hidden" name="redirect" value="https://fort888.github.io/lianxinzi-feedback/thanks.html">
 
-        <div class="field">
-          <label for="evidence">提交证据（可选，单个≤5MB，可多选）</label>
-          <input id="evidence" type="file" name="evidence" multiple
-                 accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.zip,.mp3,.mp4,.wav">
-          <ul id="fileList" class="file-list"></ul>
-          <small class="error" data-for="evidence"></small>
-        </div>
+      <!-- 防垃圾字段（隐藏） -->
+      <input type="checkbox" name="botcheck" class="hidden" style="display:none">
 
-        <div class="field checkbox">
-          <label>
-            <input id="confirmAnon" type="checkbox" required>
-            我已知悉并确认：本表单不采集姓名、邮箱或登录信息，建议不要在内容中留下可识别个人的线索。
-          </label>
-          <small class="error" data-for="confirmAnon"></small>
-        </div>
+      <!-- 举报分类 -->
+      <label for="category">举报内容分类</label>
+      <select id="category" name="category" required>
+        <option value="">请选择分类</option>
+        <option value="公司管理">公司管理</option>
+        <option value="团队协作">团队协作</option>
+        <option value="工作环境">工作环境</option>
+        <option value="福利制度">福利制度</option>
+        <option value="其他">其他</option>
+      </select>
 
-        <button class="submit" type="submit" aria-label="匿名提交">匿名提交</button>
-        <div class="tips">
-          <p>📌 提示：若提交失败，请检查网络或压缩大文件后再次尝试。</p>
-        </div>
-      </form>
-    </section>
+      <!-- 举报内容 -->
+      <label for="message">举报 / 意见内容</label>
+      <textarea id="message" name="message" placeholder="请尽量详细描述事实、时间、地点、涉及人员与影响…" maxlength="1500" required></textarea>
 
-    <footer class="footer">
-      <p>© 2025 联信资 · 保密与合规</p>
-    </footer>
-  </main>
+      <!-- 上传证据 -->
+      <label for="files">提交证据（可选，单个≤5MB，总≤10MB，可多选）</label>
+      <input
+        type="file"
+        id="files"
+        name="files"
+        multiple
+        accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.zip"
+      />
 
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-  <script src="assets/app.js"></script>
+      <!-- 同意条款 -->
+      <p>
+        <input type="checkbox" id="confirm" required />
+        我已知悉并确认：本表单不采集姓名、邮箱或登录信息，建议不要在内容中留下可识别个人的线索。
+      </p>
+
+      <button type="submit" id="submitBtn">匿名提交</button>
+      <p id="status" style="margin-top: 15px; text-align: center;"></p>
+    </form>
+  </div>
+
+  <div class="footer">© 2025 联信资集团 · 保密与合规</div>
+
+  <script>
+    const form = document.getElementById('feedbackForm');
+    const btn = document.getElementById('submitBtn');
+    form.addEventListener('submit', () => {
+      btn.disabled = true;
+      btn.textContent = '正在提交…';
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = '匿名提交';
+      }, 8000);
+    });
+  </script>
 </body>
 </html>
+
