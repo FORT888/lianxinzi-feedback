@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>联信资匿名意见箱</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+  <main class="page">
+    <header class="header">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" class="shield" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.6-8 11-4.6-1.4-8-6-8-11V5l8-3zM7.5 10.5h9m-9 3h5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span>联信资匿名意见箱</span>
+      </div>
+      <p class="subtitle">完全匿名 · 直达 Outlook · 支持提交证据</p>
+    </header>
+
+    <section class="card">
+      <form id="feedback-form" enctype="multipart/form-data">
+        <input type="hidden" id="EMAILJS_PUBLIC_KEY" value="Vf3g58_uwsuIfMxCI" />
+        <input type="hidden" id="EMAILJS_SERVICE_ID" value="service_0nbyy1m" />
+        <input type="hidden" id="EMAILJS_TEMPLATE_ID" value="template_la7d6sb" />
+
+        <div class="field">
+          <label for="category">举报内容分类</label>
+          <select id="category" name="category" required>
+            <option value="">请选择分类</option>
+            <option>公司管理</option>
+            <option>团队协作</option>
+            <option>工作环境</option>
+            <option>福利制度</option>
+            <option>其他</option>
+          </select>
+          <small class="error" data-for="category"></small>
+        </div>
+
+        <div class="field">
+          <label for="message">举报 / 意见内容</label>
+          <textarea id="message" name="message" rows="7" placeholder="请尽量清晰地描述事实、时间、地点、涉及人员与影响……" required></textarea>
+          <div class="help-row">
+            <small id="charCount">0/1500</small>
+            <small class="error" data-for="message"></small>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="evidence">提交证据（可选，单个≤5MB，可多选）</label>
+          <input id="evidence" type="file" name="evidence" multiple
+                 accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.zip,.mp3,.mp4,.wav">
+          <ul id="fileList" class="file-list"></ul>
+          <small class="error" data-for="evidence"></small>
+        </div>
+
+        <div class="field checkbox">
+          <label>
+            <input id="confirmAnon" type="checkbox" required>
+            我已知悉并确认：本表单不采集姓名、邮箱或登录信息，建议不要在内容中留下可识别个人的线索。
+          </label>
+          <small class="error" data-for="confirmAnon"></small>
+        </div>
+
+        <button class="submit" type="submit" aria-label="匿名提交">匿名提交</button>
+        <div class="tips">
+          <p>📌 提示：若提交失败，请检查网络或压缩大文件后再次尝试。</p>
+        </div>
+      </form>
+    </section>
+
+    <footer class="footer">
+      <p>© 2025 联信资 · 保密与合规</p>
+    </footer>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
