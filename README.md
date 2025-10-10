@@ -27,14 +27,25 @@
       margin-bottom: 25px;
     }
     label { display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 500; }
-    select, textarea, input[type="file"] {
-      width: 100%; padding: 10px; border-radius: 6px; border: none; font-size: 14px; margin-bottom: 15px;
+    select, textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 14px;
+      margin-bottom: 15px;
     }
     textarea { resize: vertical; min-height: 100px; }
     button {
-      background-color: #2563eb; border: none; color: white;
-      padding: 12px 20px; width: 100%; font-size: 16px;
-      border-radius: 6px; cursor: pointer; transition: 0.2s;
+      background-color: #2563eb;
+      border: none;
+      color: white;
+      padding: 12px 20px;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
     }
     button:hover { background-color: #1d4ed8; }
     .footer { text-align: center; color: #888; font-size: 14px; margin: 20px 0; }
@@ -58,12 +69,9 @@
       <label for="message">举报 / 意见内容</label>
       <textarea id="message" name="message" placeholder="请尽量详细描述事实、时间、地点、涉及人员与影响…" maxlength="1500" required></textarea>
 
-      <label for="evidence">提交证据（可选，单个 ≤5MB，可多选）</label>
-      <input type="file" id="evidence" name="evidence" multiple accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.zip" />
-
       <p>
         <input type="checkbox" id="confirm" required />
-        我已知悉并确认：本表单不采集姓名、邮箱或登录信息。
+        我已知悉并确认：本表单不采集姓名、邮箱或登录信息，建议不要在内容中留下可识别个人的线索。
       </p>
 
       <button type="submit" id="submitBtn">匿名提交</button>
@@ -87,32 +95,20 @@
     const status = document.getElementById("status");
     const btn = document.getElementById("submitBtn");
 
-    form.addEventListener("submit", async (e) => {
+    form.addEventListener("submit", (e) => {
       e.preventDefault();
       btn.disabled = true;
       btn.textContent = "正在提交…";
-      status.textContent = "请稍候，正在上传…";
-
-      const files = document.getElementById("evidence").files;
-      let fileBase64List = [];
-
-      for (let file of files) {
-        const base64 = await toBase64(file);
-        fileBase64List.push({
-          filename: file.name,
-          content: base64.split(",")[1]
-        });
-      }
+      status.textContent = "请稍候，正在匿名发送…";
 
       const params = {
         category: form.category.value,
-        message: form.message.value,
-        attachments: fileBase64List,
+        message: form.message.value
       };
 
       emailjs.send(serviceID, templateID, params)
         .then(() => {
-          status.textContent = "✅ 举报已成功匿名提交！";
+          status.textContent = "✅ 举报已匿名提交成功！";
           form.reset();
         })
         .catch((err) => {
@@ -124,15 +120,6 @@
           btn.textContent = "匿名提交";
         });
     });
-
-    function toBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-      });
-    }
   </script>
 </body>
 </html>
