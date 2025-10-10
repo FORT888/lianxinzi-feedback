@@ -6,6 +6,9 @@
   <title>联信资匿名意见箱</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600&display=swap" rel="stylesheet" />
   <style>
+    header, h1:first-of-type {
+      display: none !important;
+    }
     body {
       font-family: 'Noto Sans SC', sans-serif;
       background: radial-gradient(circle at top, #0e1630, #020617);
@@ -13,19 +16,18 @@
       margin: 0;
       padding: 0;
     }
-    h1 {
-      text-align: center;
-      margin-top: 50px;
-      font-weight: 600;
-      color: #fff;
-    }
-    form {
+    .container {
       max-width: 600px;
-      margin: 30px auto;
+      margin: 80px auto;
       background: rgba(255, 255, 255, 0.08);
-      padding: 25px;
+      padding: 30px;
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    h2 {
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 25px;
     }
     label {
       display: block;
@@ -69,33 +71,34 @@
 </head>
 
 <body>
-  <h1>联信资匿名意见箱</h1>
+  <div class="container">
+    <h2>联信资匿名意见箱</h2>
+    <form id="feedbackForm">
+      <label for="category">举报内容分类</label>
+      <select id="category" name="category" required>
+        <option value="">请选择分类</option>
+        <option value="公司管理">公司管理</option>
+        <option value="团队协作">团队协作</option>
+        <option value="工作环境">工作环境</option>
+        <option value="福利制度">福利制度</option>
+        <option value="其他">其他</option>
+      </select>
 
-  <form id="feedbackForm">
-    <label for="category">举报内容分类</label>
-    <select id="category" name="category" required>
-      <option value="">请选择分类</option>
-      <option value="公司管理">公司管理</option>
-      <option value="团队协作">团队协作</option>
-      <option value="工作环境">工作环境</option>
-      <option value="福利制度">福利制度</option>
-      <option value="其他">其他</option>
-    </select>
+      <label for="message">举报 / 意见内容</label>
+      <textarea id="message" name="message" placeholder="请尽量详细描述事实、时间、地点、涉及人员与影响…" maxlength="1500" required></textarea>
 
-    <label for="message">举报 / 意见内容</label>
-    <textarea id="message" name="message" placeholder="请尽量详细描述事实、时间、地点、涉及人员与影响…" maxlength="1500" required></textarea>
+      <label for="evidence">提交证据（可选，单个≤5MB，可多选）</label>
+      <input type="file" id="evidence" name="evidence" multiple />
 
-    <label for="evidence">提交证据（可选，单个≤5MB，可多选）</label>
-    <input type="file" id="evidence" name="evidence" multiple />
+      <p>
+        <input type="checkbox" id="confirm" required />
+        我已知悉并确认：本表单不采集姓名、邮箱或登录信息，建议不要在内容中留下可识别个人的线索。
+      </p>
 
-    <p>
-      <input type="checkbox" id="confirm" required />
-      我已知悉并确认：本表单不采集姓名、邮箱或登录信息，建议不要在内容中留下可识别个人的线索。
-    </p>
-
-    <button type="submit">匿名提交</button>
-    <p id="status" style="margin-top: 15px; text-align: center;"></p>
-  </form>
+      <button type="submit">匿名提交</button>
+      <p id="status" style="margin-top: 15px; text-align: center;"></p>
+    </form>
+  </div>
 
   <div class="footer">© 2025 联信资集团 · 保密与合规</div>
 
@@ -103,7 +106,7 @@
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <script>
     (function() {
-      emailjs.init("Vf3g58_uwsuIfMxCI"); // 你的 Public Key
+      emailjs.init("Vf3g58_uwsuIfMxCI");
     })();
 
     const form = document.getElementById("feedbackForm");
