@@ -10,25 +10,55 @@
     body {
       font-family: 'Noto Sans SC', sans-serif;
       background: radial-gradient(circle at top, #0e1630, #020617);
-      color: #fff; margin: 0; padding: 0;
+      color: #fff;
+      margin: 0; padding: 0;
     }
     .container {
-      max-width: 600px; margin: 80px auto; background: rgba(255,255,255,0.08);
-      padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      max-width: 600px;
+      margin: 80px auto;
+      background: rgba(255,255,255,0.08);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
-    h2 { text-align: center; font-weight: 600; margin-bottom: 25px; }
-    label { display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 500; }
+    h2 {
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 25px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
     select, textarea, input[type="file"] {
-      width: 100%; padding: 10px; border-radius: 6px; border: none;
-      font-size: 14px; margin-bottom: 15px;
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 14px;
+      margin-bottom: 15px;
     }
     textarea { resize: vertical; min-height: 100px; }
     button {
-      background-color: #2563eb; border: none; color: white; padding: 12px 20px;
-      width: 100%; font-size: 16px; border-radius: 6px; cursor: pointer; transition: .2s;
+      background-color: #2563eb;
+      border: none;
+      color: white;
+      padding: 12px 20px;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
     }
     button:hover { background-color: #1d4ed8; }
-    .footer { text-align: center; color: #888; font-size: 14px; margin: 20px 0; }
+    .footer {
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+      margin: 20px 0;
+    }
   </style>
 </head>
 
@@ -36,21 +66,22 @@
   <div class="container">
     <h2>联信资匿名意见箱</h2>
 
-    <!-- 使用 Web3Forms：无需任何 JS -->
+    <!-- ✅ 使用 Web3Forms 表单 -->
     <form action="https://api.web3forms.com/submit" method="POST" enctype="multipart/form-data" id="feedbackForm">
-      <!-- 1) 必填：你的 Web3Forms Access Key（到 web3forms.com 注册后在 Dashboard 里复制） -->
-      <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY" />
+      <!-- 你的 Web3Forms Access Key（请勿泄露） -->
+      <input type="hidden" name="access_key" value="3f6dc6a5-9766-48b9-8e3f-43dca5b366d8">
 
-      <!-- 2) 可选：邮件主题与发件名（收件时更清晰） -->
-      <input type="hidden" name="subject" value="联信资匿名意见箱 - 新举报" />
-      <input type="hidden" name="from_name" value="联信资匿名意见箱" />
+      <!-- 邮件主题与来源 -->
+      <input type="hidden" name="subject" value="联信资匿名意见箱 - 新举报">
+      <input type="hidden" name="from_name" value="联信资匿名意见箱">
 
-      <!-- 3) 可选：提交成功后跳转到感谢页（你的仓库已含 thanks.html） -->
-      <input type="hidden" name="redirect" value="https://fort888.github.io/lianxinzi-feedback/thanks.html" />
+      <!-- 成功后跳转到感谢页 -->
+      <input type="hidden" name="redirect" value="https://fort888.github.io/lianxinzi-feedback/thanks.html">
 
-      <!-- 4) 反垃圾字段（隐藏），请保留 -->
+      <!-- 防垃圾字段（隐藏） -->
       <input type="checkbox" name="botcheck" class="hidden" style="display:none">
 
+      <!-- 举报分类 -->
       <label for="category">举报内容分类</label>
       <select id="category" name="category" required>
         <option value="">请选择分类</option>
@@ -61,9 +92,11 @@
         <option value="其他">其他</option>
       </select>
 
+      <!-- 举报内容 -->
       <label for="message">举报 / 意见内容</label>
       <textarea id="message" name="message" placeholder="请尽量详细描述事实、时间、地点、涉及人员与影响…" maxlength="1500" required></textarea>
 
+      <!-- 上传证据 -->
       <label for="files">提交证据（可选，单个≤5MB，总≤10MB，可多选）</label>
       <input
         type="file"
@@ -73,6 +106,7 @@
         accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.zip"
       />
 
+      <!-- 同意条款 -->
       <p>
         <input type="checkbox" id="confirm" required />
         我已知悉并确认：本表单不采集姓名、邮箱或登录信息，建议不要在内容中留下可识别个人的线索。
@@ -85,14 +119,16 @@
 
   <div class="footer">© 2025 联信资集团 · 保密与合规</div>
 
-  <!-- 小提升体验：提交时给按钮加“正在提交…”提示，不拦截提交 -->
   <script>
     const form = document.getElementById('feedbackForm');
     const btn = document.getElementById('submitBtn');
     form.addEventListener('submit', () => {
       btn.disabled = true;
       btn.textContent = '正在提交…';
-      setTimeout(() => { btn.disabled = false; btn.textContent = '匿名提交'; }, 8000);
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = '匿名提交';
+      }, 8000);
     });
   </script>
 </body>
