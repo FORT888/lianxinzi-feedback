@@ -141,11 +141,11 @@
         }
       }
 
-      // ✅ 发送参数
+      // ✅ 发送参数（传字符串，不传数组）
       const params = {
         category: form.category.value,
         message: form.message.value,
-        evidence: uploadedUrls.length ? uploadedUrls : [] // ✅ 改为 evidence（数组）
+        evidence: uploadedUrls.length ? uploadedUrls.join("\n") : "无附件"
       };
 
       emailjs.send(serviceID, templateID, params)
