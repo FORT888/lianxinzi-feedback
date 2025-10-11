@@ -21,49 +21,19 @@
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
-    h2 {
-      text-align: center;
-      font-weight: 600;
-      margin-bottom: 25px;
-    }
-    label {
-      display: block;
-      margin-top: 15px;
-      margin-bottom: 5px;
-      font-weight: 500;
-    }
+    h2 { text-align: center; font-weight: 600; margin-bottom: 25px; }
+    label { display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 500; }
     select, textarea, input[type="file"] {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      font-size: 14px;
-      margin-bottom: 15px;
+      width: 100%; padding: 10px; border-radius: 6px; border: none;
+      font-size: 14px; margin-bottom: 15px;
     }
-    textarea {
-      resize: vertical;
-      min-height: 100px;
-    }
+    textarea { resize: vertical; min-height: 100px; }
     button {
-      background-color: #2563eb;
-      border: none;
-      color: white;
-      padding: 12px 20px;
-      width: 100%;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.2s;
+      background-color: #2563eb; border: none; color: white; padding: 12px 20px;
+      width: 100%; font-size: 16px; border-radius: 6px; cursor: pointer; transition: .2s;
     }
-    button:hover {
-      background-color: #1d4ed8;
-    }
-    .footer {
-      text-align: center;
-      color: #888;
-      font-size: 14px;
-      margin: 20px 0;
-    }
+    button:hover { background-color: #1d4ed8; }
+    .footer { text-align: center; color: #888; font-size: 14px; margin: 20px 0; }
   </style>
 </head>
 
@@ -125,13 +95,13 @@
       const files = document.getElementById("evidence").files;
       let uploadedUrls = [];
 
-      // ✅ 正确的文件上传接口（去掉 v1.0）
+      // ✅ 使用 EmailJS 最新上传接口（v1.1）
       for (const file of files) {
         const formData = new FormData();
         formData.append("file", file);
 
         try {
-          const res = await fetch("https://api.emailjs.com/api/v1/files/upload", {
+          const res = await fetch("https://api.emailjs.com/api/v1.1/upload", {
             method: "POST",
             body: formData
           });
