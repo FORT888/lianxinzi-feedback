@@ -21,19 +21,49 @@
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
-    h2 { text-align: center; font-weight: 600; margin-bottom: 25px; }
-    label { display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 500; }
+    h2 {
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 25px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
     select, textarea, input[type="file"] {
-      width: 100%; padding: 10px; border-radius: 6px; border: none;
-      font-size: 14px; margin-bottom: 15px;
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      font-size: 14px;
+      margin-bottom: 15px;
     }
-    textarea { resize: vertical; min-height: 100px; }
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
     button {
-      background-color: #2563eb; border: none; color: white; padding: 12px 20px;
-      width: 100%; font-size: 16px; border-radius: 6px; cursor: pointer; transition: .2s;
+      background-color: #2563eb;
+      border: none;
+      color: white;
+      padding: 12px 20px;
+      width: 100%;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.2s;
     }
-    button:hover { background-color: #1d4ed8; }
-    .footer { text-align: center; color: #888; font-size: 14px; margin: 20px 0; }
+    button:hover {
+      background-color: #1d4ed8;
+    }
+    .footer {
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+      margin: 20px 0;
+    }
   </style>
 </head>
 
@@ -72,11 +102,11 @@
 
   <div class="footer">© 2025 联信资 版权所有</div>
 
-  <!-- ✅ EmailJS SDK -->
+  <!-- EmailJS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
     (function() {
-      emailjs.init("Vf3g58_uwsuIfMxCI"); // ✅ 你的 Public Key
+      emailjs.init("Vf3g58_uwsuIfMxCI"); // ✅ Public Key
     })();
 
     const serviceID = "service_0nbyy1m";     // ✅ 你的 Service ID
@@ -95,16 +125,16 @@
       const files = document.getElementById("evidence").files;
       let uploadedUrls = [];
 
-      // ✅ 使用 EmailJS 最新上传接口（v1.1）
+      // ✅ 上传文件到 EmailJS Pro 文件服务器（新版接口）
       for (const file of files) {
         const formData = new FormData();
         formData.append("file", file);
-
         try {
           const res = await fetch("https://api.emailjs.com/api/v1.1/upload", {
             method: "POST",
             body: formData
           });
+          if (!res.ok) throw new Error("上传失败");
           const data = await res.json();
           if (data && data.url) uploadedUrls.push(data.url);
         } catch (err) {
@@ -112,7 +142,7 @@
         }
       }
 
-      // ✅ 构建模板参数
+      // ✅ 发送到 EmailJS 模板
       const params = {
         category: form.category.value,
         message: form.message.value,
@@ -125,7 +155,7 @@
           form.reset();
         })
         .catch((err) => {
-          console.error(err);
+          console.error("发送失败：", err);
           status.textContent = "❌ 提交失败，请稍后再试。";
         })
         .finally(() => {
