@@ -102,15 +102,15 @@
 
   <div class="footer">© 2025 联信资 版权所有</div>
 
-  <!-- EmailJS -->
+  <!-- EmailJS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
     (function() {
-      emailjs.init("Vf3g58_uwsuIfMxCI"); // ✅ 你的 Public Key
+      emailjs.init("Vf3g58_uwsuIfMxCI"); // ✅ Public Key
     })();
 
-    const serviceID = "service_0nbyy1m";     // ✅ 你的 Service ID
-    const templateID = "template_la7d6sb";   // ✅ 你的 Template ID
+    const serviceID = "service_0nbyy1m";     // ✅ Service ID
+    const templateID = "template_la7d6sb";   // ✅ Template ID
 
     const form = document.getElementById("feedbackForm");
     const status = document.getElementById("status");
@@ -125,7 +125,7 @@
       const files = document.getElementById("evidence").files;
       let uploadedUrls = [];
 
-      // 上传每个文件
+      // ✅ 上传文件到 EmailJS 文件服务器
       for (const file of files) {
         const formData = new FormData();
         formData.append("file", file);
@@ -141,10 +141,11 @@
         }
       }
 
+      // ✅ 发送参数
       const params = {
         category: form.category.value,
         message: form.message.value,
-        evidence_list: uploadedUrls.length ? uploadedUrls : [] // ✅ 传递数组
+        evidence: uploadedUrls.length ? uploadedUrls : [] // ✅ 改为 evidence（数组）
       };
 
       emailjs.send(serviceID, templateID, params)
@@ -164,4 +165,3 @@
   </script>
 </body>
 </html>
-
