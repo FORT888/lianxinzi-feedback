@@ -123,9 +123,8 @@
       status.textContent = "请稍候，正在上传与发送…";
 
       const files = document.getElementById("evidence").files;
-      let uploadedUrls = [];
+      let previewHtml = "";
 
-      // ✅ 上传文件到 EmailJS 文件服务器
       for (const file of files) {
         const formData = new FormData();
         formData.append("file", file);
@@ -135,17 +134,24 @@
             body: formData
           });
           const data = await res.json();
-          if (data && data.url) uploadedUrls.push(data.url);
+          if (data && data.url) {
+            if (file.type.startsWith("image/")) {
+              // ✅ 图片直接显示缩略图
+              previewHtml += `<div><a href="${data.url}" target="_blank">📎 点击查看原图</a><br><img src="${data.url}" style="max-width:300px;border-radius:6px;margin:8px 0;"></div>`;
+            } else {
+              // ✅ 其他文件只显示下载链接
+              previewHtml += `<div><a href="${data.url}" target="_blank" style="color:#2563eb;">📄 ${file.name}</a></div>`;
+            }
+          }
         } catch (err) {
           console.error("文件上传失败：", err);
         }
       }
 
-      // ✅ 发送参数（传字符串，不传数组）
       const params = {
         category: form.category.value,
         message: form.message.value,
-        evidence: uploadedUrls.length ? uploadedUrls.join("\n") : "无附件"
+        evidence: previewHtml || "无附件"
       };
 
       emailjs.send(serviceID, templateID, params)
