@@ -102,15 +102,15 @@
 
   <div class="footer">© 2025 联信资 版权所有</div>
 
-  <!-- EmailJS SDK -->
+  <!-- ✅ EmailJS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
     (function() {
-      emailjs.init("Vf3g58_uwsuIfMxCI"); // ✅ Public Key
+      emailjs.init("Vf3g58_uwsuIfMxCI"); // ✅ 你的 Public Key
     })();
 
-    const serviceID = "service_0nbyy1m";     // ✅ Service ID
-    const templateID = "template_la7d6sb";   // ✅ Template ID
+    const serviceID = "service_0nbyy1m";     // ✅ 你的 Service ID
+    const templateID = "template_la7d6sb";   // ✅ 你的 Template ID
 
     const form = document.getElementById("feedbackForm");
     const status = document.getElementById("status");
@@ -123,35 +123,30 @@
       status.textContent = "请稍候，正在上传与发送…";
 
       const files = document.getElementById("evidence").files;
-      let previewHtml = "";
+      let uploadedUrls = [];
 
+      // ✅ 正确的文件上传接口（去掉 v1.0）
       for (const file of files) {
         const formData = new FormData();
         formData.append("file", file);
+
         try {
-          const res = await fetch("https://api.emailjs.com/api/v1.0/files/upload", {
+          const res = await fetch("https://api.emailjs.com/api/v1/files/upload", {
             method: "POST",
             body: formData
           });
           const data = await res.json();
-          if (data && data.url) {
-            if (file.type.startsWith("image/")) {
-              // ✅ 图片直接显示缩略图
-              previewHtml += `<div><a href="${data.url}" target="_blank">📎 点击查看原图</a><br><img src="${data.url}" style="max-width:300px;border-radius:6px;margin:8px 0;"></div>`;
-            } else {
-              // ✅ 其他文件只显示下载链接
-              previewHtml += `<div><a href="${data.url}" target="_blank" style="color:#2563eb;">📄 ${file.name}</a></div>`;
-            }
-          }
+          if (data && data.url) uploadedUrls.push(data.url);
         } catch (err) {
           console.error("文件上传失败：", err);
         }
       }
 
+      // ✅ 构建模板参数
       const params = {
         category: form.category.value,
         message: form.message.value,
-        evidence: previewHtml || "无附件"
+        evidence: uploadedUrls.length ? uploadedUrls.join("\n") : "无附件"
       };
 
       emailjs.send(serviceID, templateID, params)
