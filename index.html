@@ -21,49 +21,19 @@
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     }
-    h2 {
-      text-align: center;
-      font-weight: 600;
-      margin-bottom: 25px;
-    }
-    label {
-      display: block;
-      margin-top: 15px;
-      margin-bottom: 5px;
-      font-weight: 500;
-    }
+    h2 { text-align: center; font-weight: 600; margin-bottom: 25px; }
+    label { display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 500; }
     select, textarea, input[type="file"] {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      font-size: 14px;
-      margin-bottom: 15px;
+      width: 100%; padding: 10px; border-radius: 6px; border: none;
+      font-size: 14px; margin-bottom: 15px;
     }
-    textarea {
-      resize: vertical;
-      min-height: 100px;
-    }
+    textarea { resize: vertical; min-height: 100px; }
     button {
-      background-color: #2563eb;
-      border: none;
-      color: white;
-      padding: 12px 20px;
-      width: 100%;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.2s;
+      background-color: #2563eb; border: none; color: white; padding: 12px 20px;
+      width: 100%; font-size: 16px; border-radius: 6px; cursor: pointer; transition: .2s;
     }
-    button:hover {
-      background-color: #1d4ed8;
-    }
-    .footer {
-      text-align: center;
-      color: #888;
-      font-size: 14px;
-      margin: 20px 0;
-    }
+    button:hover { background-color: #1d4ed8; }
+    .footer { text-align: center; color: #888; font-size: 14px; margin: 20px 0; }
   </style>
 </head>
 
@@ -102,15 +72,15 @@
 
   <div class="footer">© 2025 联信资 版权所有</div>
 
-  <!-- EmailJS SDK -->
+  <!-- ✅ EmailJS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
     (function() {
-      emailjs.init("Vf3g58_uwsuIfMxCI"); // ✅ Public Key
+      emailjs.init("Vf3g58_uwsuIfMxCI"); // ✅ 你的 Public Key
     })();
 
-    const serviceID = "service_0nbyy1m";     // ✅ Service ID
-    const templateID = "template_la7d6sb";   // ✅ Template ID
+    const serviceID = "service_0nbyy1m";     // ✅ 你的 Service ID
+    const templateID = "template_la7d6sb";   // ✅ 你的 Template ID
 
     const form = document.getElementById("feedbackForm");
     const status = document.getElementById("status");
@@ -123,35 +93,30 @@
       status.textContent = "请稍候，正在上传与发送…";
 
       const files = document.getElementById("evidence").files;
-      let previewHtml = "";
+      let uploadedUrls = [];
 
+      // ✅ 使用 EmailJS 最新上传接口（v1.1）
       for (const file of files) {
         const formData = new FormData();
         formData.append("file", file);
+
         try {
-          const res = await fetch("https://api.emailjs.com/api/v1.0/files/upload", {
+          const res = await fetch("https://api.emailjs.com/api/v1.1/upload", {
             method: "POST",
             body: formData
           });
           const data = await res.json();
-          if (data && data.url) {
-            if (file.type.startsWith("image/")) {
-              // ✅ 图片直接显示缩略图
-              previewHtml += `<div><a href="${data.url}" target="_blank">📎 点击查看原图</a><br><img src="${data.url}" style="max-width:300px;border-radius:6px;margin:8px 0;"></div>`;
-            } else {
-              // ✅ 其他文件只显示下载链接
-              previewHtml += `<div><a href="${data.url}" target="_blank" style="color:#2563eb;">📄 ${file.name}</a></div>`;
-            }
-          }
+          if (data && data.url) uploadedUrls.push(data.url);
         } catch (err) {
           console.error("文件上传失败：", err);
         }
       }
 
+      // ✅ 构建模板参数
       const params = {
         category: form.category.value,
         message: form.message.value,
-        evidence: previewHtml || "无附件"
+        evidence: uploadedUrls.length ? uploadedUrls.join("\n") : "无附件"
       };
 
       emailjs.send(serviceID, templateID, params)
@@ -171,4 +136,5 @@
   </script>
 </body>
 </html>
+
 
