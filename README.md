@@ -67,16 +67,15 @@
 
   <div class="footer">© 2025 联信资 版权所有</div>
 
-  <!-- EmailJS 脚本部分 -->
+  <!-- EmailJS -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
     (function() {
-      emailjs.init("Vf3g58_uwsuIfMxCI"); // 你的 Public Key
+      emailjs.init("Vf3g58_uwsuIfMxCI"); // ← 你的 Public Key
     })();
 
-    const serviceID = "service_0nbyy1m";     // Service ID
-    const templateID = "template_la7d6sb";   // Template ID
-
+    const serviceID = "service_0nbyy1m";     // ← 你的 Service ID
+    const templateID = "template_la7d6sb";   // ← 你的 Template ID
     const form = document.getElementById("feedbackForm");
     const status = document.getElementById("status");
     const btn = document.getElementById("submitBtn");
@@ -88,22 +87,31 @@
       status.textContent = "请稍候，正在上传与发送…";
 
       const files = document.getElementById("evidence").files;
-      let uploadedUrls = [];
+      const uploadedUrls = [];
 
-      // 上传文件到 EmailJS 文件服务器（Pro 功能）
-      for (const file of files) {
-        const formData = new FormData();
-        formData.append("file", file);
+      // 上传文件到 EmailJS 文件服务器
+      if (files.length > 0) {
+        for (const file of files) {
+          const formData = new FormData();
+          formData.append("file", file);
+          try {
+            const res = await fetch("https://api.emailjs.com/api/v1.0/files/upload", {
+              method: "POST",
+              body: formData
+            });
 
-        try {
-          const res = await fetch("https://api.emailjs.com/api/v1.0/files/upload", {
-            method: "POST",
-            body: formData
-          });
-          const data = await res.json();
-          if (data && data.url) uploadedUrls.push(data.url);
-        } catch (err) {
-          console.error("文件上传失败：", err);
+            if (!res.ok) throw new Error(`上传失败: ${res.status}`);
+            const data = await res.json();
+            if (data && data.url) {
+              uploadedUrls.push(data.url);
+              console.log("✅ 上传成功:", data.url);
+            } else {
+              console.warn("⚠️ 未返回 URL:", data);
+            }
+          } catch (err) {
+            console.error("文件上传失败：", err);
+            status.textContent = "⚠️ 文件上传失败，请检查网络或稍后重试。";
+          }
         }
       }
 
@@ -113,19 +121,17 @@
         evidence: uploadedUrls.length ? uploadedUrls.join("\n") : "无附件"
       };
 
-      emailjs.send(serviceID, templateID, params)
-        .then(() => {
-          status.textContent = "✅ 举报已匿名提交成功！";
-          form.reset();
-        })
-        .catch((err) => {
-          console.error(err);
-          status.textContent = "❌ 提交失败，请稍后再试。";
-        })
-        .finally(() => {
-          btn.disabled = false;
-          btn.textContent = "匿名提交";
-        });
+      try {
+        await emailjs.send(serviceID, templateID, params);
+        status.textContent = "✅ 举报已匿名提交成功！";
+        form.reset();
+      } catch (err) {
+        console.error("发送失败：", err);
+        status.textContent = "❌ 提交失败，请稍后再试。";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "匿名提交";
+      }
     });
   </script>
 </body>
