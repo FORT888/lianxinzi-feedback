@@ -1,4 +1,4 @@
-// EmailJS client
+// EmailJS client logic
 const form = document.getElementById('feedback-form');
 const evidence = document.getElementById('evidence');
 const fileList = document.getElementById('fileList');
@@ -26,7 +26,7 @@ evidence.addEventListener('change', () => {
   const arr = Array.from(evidence.files || []);
   arr.forEach(f => {
     const li = document.createElement('li');
-    li.textContent = `${f.name} — ${(f.size / (1024*1024)).toFixed(2)}MB`;
+    li.textContent = `${f.name} — ${(f.size / (1024 * 1024)).toFixed(2)}MB`;
     fileList.appendChild(li);
   });
 });
@@ -40,13 +40,16 @@ function validate() {
 
   if (!category.value) { setError('category', '请选择一个分类'); ok = false; }
   if (!message.value.trim()) { setError('message', '请填写举报/意见内容'); ok = false; }
+
   const arr = Array.from(evidence.files || []);
   for (const f of arr) {
     if (f.size > MAX_MB * 1024 * 1024) {
-      setError('evidence', `文件“${f.name}”超过 ${MAX_MB}MB，建议先压缩后再上传`);
-      ok = false; break;
+      setError('evidence', `文件“${f.name}”超过 ${MAX_MB}MB，请压缩后上传`);
+      ok = false;
+      break;
     }
   }
+
   if (!confirmAnon.checked) { setError('confirmAnon', '请勾选确认匿名提示'); ok = false; }
   return ok;
 }
@@ -59,33 +62,54 @@ form.addEventListener('submit', async (e) => {
   const SERVICE_ID = document.getElementById('EMAILJS_SERVICE_ID').value.trim();
   const TEMPLATE_ID = document.getElementById('EMAILJS_TEMPLATE_ID').value.trim();
 
-  if (!PUBLIC_KEY || !SERVICE_ID || !TEMPLATE_ID) {
-    alert('尚未配置 EmailJS 的 Public Key / Service ID / Template ID。请先在 index.html 顶部隐藏字段中填入你的值。');
-    return;
-  }
-
-  // Init EmailJS
   emailjs.init(PUBLIC_KEY);
 
-  // Inject subject
-  const subject = `联信资匿名意见箱 - ${category.value || '未分类'}`;
-  const subjectInput = document.createElement('input');
-  subjectInput.type = 'hidden';
-  subjectInput.name = 'subject';
-  subjectInput.value = subject;
-  form.appendChild(subjectInput);
+  document.querySelector('.submit').disabled = true;
+  const status = document.getElementById('status');
+  status.textContent = '正在上传文件，请稍候…';
+
+  const files = Array.from(evidence.files || []);
+  let uploadedUrls = [];
+
+  for (const file of files) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("https://api.emailjs.com/api/v1/files/upload", {
+        method: "POST",
+        body: formData
+      });
+      const data = await res.json();
+      if (data && data.url) uploadedUrls.push(data.url);
+    } catch (err) {
+      console.error("上传失败：", err);
+    }
+  }
+
+  const params = {
+    category: category.value,
+    message: message.value,
+    evidence: uploadedUrls.length ? uploadedUrls.join("\n") : "无附件"
+  };
+
+  status.textContent = '正在发送邮件，请稍候…';
 
   try {
-    const res = await emailjs.sendForm(SERVICE_ID, TEMPLATE_ID, form);
+    const res = await emailjs.send(SERVICE_ID, TEMPLATE_ID, params);
     if (res.status === 200) {
-      window.location.href = 'thanks.html';
+      status.textContent = "✅ 举报已匿名提交成功！";
+      form.reset();
+      fileList.innerHTML = '';
+      charCount.textContent = '0/1500';
     } else {
-      alert('提交失败：' + (res.text || '未知错误'));
+      status.textContent = "❌ 提交失败：" + res.text;
     }
   } catch (err) {
     console.error(err);
-    alert('网络异常或服务不可用，请稍后再试。');
+    status.textContent = "❌ 网络异常，请稍后重试。";
   } finally {
-    form.removeChild(subjectInput);
+    document.querySelector('.submit').disabled = false;
   }
 });
+
