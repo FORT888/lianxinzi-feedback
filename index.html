@@ -18,7 +18,7 @@
     }
     h2 { text-align: center; font-weight: 600; margin-bottom: 25px; }
     label { display: block; margin-top: 15px; margin-bottom: 5px; font-weight: 500; }
-    select, textarea {
+    select, textarea, input[type="file"] {
       width: 100%; padding: 10px; border-radius: 6px; border: none;
       font-size: 14px; margin-bottom: 15px;
     }
@@ -52,6 +52,9 @@
         placeholder="请您如实填写宝贵的意见或举报内容，我们会认真核实并及时处理。"
         maxlength="1500" required></textarea>
 
+      <label for="evidence">上传证据（可选，单个≤5MB，可多选）</label>
+      <input type="file" id="evidence" name="evidence" multiple accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.zip,.rar" />
+
       <p>
         <input type="checkbox" id="confirm" required />
         我已知悉并确认：本表单不采集姓名、邮箱或登录信息。
@@ -64,40 +67,60 @@
 
   <div class="footer">© 2025 联信资 版权所有</div>
 
-  <!-- EmailJS -->
+  <!-- EmailJS 脚本部分 -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script>
     (function() {
       emailjs.init("Vf3g58_uwsuIfMxCI"); // 你的 Public Key
     })();
 
-    const serviceID = "service_0nbyy1m";     // 你的 Service ID
-    const templateID = "template_la7d6sb";   // 你的 Template ID
+    const serviceID = "service_0nbyy1m";     // Service ID
+    const templateID = "template_la7d6sb";   // Template ID
 
     const form = document.getElementById("feedbackForm");
     const status = document.getElementById("status");
     const btn = document.getElementById("submitBtn");
 
-    form.addEventListener("submit", (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
       btn.disabled = true;
       btn.textContent = "正在提交…";
-      status.textContent = "请稍候…";
+      status.textContent = "请稍候，正在上传与发送…";
+
+      const files = document.getElementById("evidence").files;
+      let uploadedUrls = [];
+
+      // 上传文件到 EmailJS 文件服务器（Pro 功能）
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+          const res = await fetch("https://api.emailjs.com/api/v1.0/files/upload", {
+            method: "POST",
+            body: formData
+          });
+          const data = await res.json();
+          if (data && data.url) uploadedUrls.push(data.url);
+        } catch (err) {
+          console.error("文件上传失败：", err);
+        }
+      }
 
       const params = {
         category: form.category.value,
         message: form.message.value,
-        evidence: "无"  // 若模板含 {{evidence}}，固定传“无”
+        evidence: uploadedUrls.length ? uploadedUrls.join("\n") : "无附件"
       };
 
       emailjs.send(serviceID, templateID, params)
         .then(() => {
-          status.textContent = "✅ 举报已成功匿名提交！";
+          status.textContent = "✅ 举报已匿名提交成功！";
           form.reset();
         })
         .catch((err) => {
           console.error(err);
-          status.textContent = "❌ 提交失败，请稍后重试。";
+          status.textContent = "❌ 提交失败，请稍后再试。";
         })
         .finally(() => {
           btn.disabled = false;
@@ -107,6 +130,7 @@
   </script>
 </body>
 </html>
+
 
 
 
