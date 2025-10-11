@@ -109,8 +109,8 @@
       emailjs.init("Vf3g58_uwsuIfMxCI"); // ✅ Public Key
     })();
 
-    const serviceID = "service_0nbyy1m";     // ✅ 你的 Service ID
-    const templateID = "template_la7d6sb";   // ✅ 你的 Template ID
+    const serviceID = "service_0nbyy1m";     // ✅ Service ID
+    const templateID = "template_la7d6sb";   // ✅ Template ID
 
     const form = document.getElementById("feedbackForm");
     const status = document.getElementById("status");
@@ -125,16 +125,18 @@
       const files = document.getElementById("evidence").files;
       let uploadedUrls = [];
 
-      // ✅ 上传文件到 EmailJS Pro 文件服务器（新版接口）
+      // ✅ 正确的 EmailJS Pro 文件上传接口
       for (const file of files) {
         const formData = new FormData();
         formData.append("file", file);
+        formData.append("public_key", "Vf3g58_uwsuIfMxCI");
+        formData.append("service_id", "service_0nbyy1m");
+
         try {
           const res = await fetch("https://api.emailjs.com/api/v1.1/upload", {
             method: "POST",
             body: formData
           });
-          if (!res.ok) throw new Error("上传失败");
           const data = await res.json();
           if (data && data.url) uploadedUrls.push(data.url);
         } catch (err) {
@@ -142,7 +144,6 @@
         }
       }
 
-      // ✅ 发送到 EmailJS 模板
       const params = {
         category: form.category.value,
         message: form.message.value,
@@ -155,7 +156,7 @@
           form.reset();
         })
         .catch((err) => {
-          console.error("发送失败：", err);
+          console.error(err);
           status.textContent = "❌ 提交失败，请稍后再试。";
         })
         .finally(() => {
@@ -166,6 +167,7 @@
   </script>
 </body>
 </html>
+
 
 
 
