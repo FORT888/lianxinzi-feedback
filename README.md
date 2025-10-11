@@ -62,7 +62,7 @@
     </form>
   </div>
 
-  <div class="footer">© 2025 联信资集团 · 保密与合规</div>
+  <div class="footer">© 2025 联信资 版权所有</div>
 
   <!-- EmailJS -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
