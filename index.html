@@ -1,172 +1,91 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>联信资匿名意见箱</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600&display=swap" rel="stylesheet" />
-  <style>
-    body {
-      font-family: 'Noto Sans SC', sans-serif;
-      background: radial-gradient(circle at top, #0e1630, #020617);
-      color: #fff;
-      margin: 0;
-      padding: 0;
-    }
-    .container {
-      max-width: 600px;
-      margin: 80px auto;
-      background: rgba(255,255,255,0.08);
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    }
-    h2 {
-      text-align: center;
-      font-weight: 600;
-      margin-bottom: 25px;
-    }
-    label {
-      display: block;
-      margin-top: 15px;
-      margin-bottom: 5px;
-      font-weight: 500;
-    }
-    select, textarea, input[type="file"] {
-      width: 100%;
-      padding: 10px;
-      border-radius: 6px;
-      border: none;
-      font-size: 14px;
-      margin-bottom: 15px;
-    }
-    textarea {
-      resize: vertical;
-      min-height: 100px;
-    }
-    button {
-      background-color: #2563eb;
-      border: none;
-      color: white;
-      padding: 12px 20px;
-      width: 100%;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    button:hover {
-      background-color: #1d4ed8;
-    }
-    .footer {
-      text-align: center;
-      color: #888;
-      font-size: 14px;
-      margin: 20px 0;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="container">
-    <h2>联信资匿名意见箱</h2>
-
-    <form id="feedbackForm">
-      <label for="category">反馈内容分类</label>
-      <select id="category" name="category" required>
-        <option value="">请选择分类</option>
-        <option value="公司管理">公司管理</option>
-        <option value="团队协作">团队协作</option>
-        <option value="线下办事处环境">线下办事处环境</option>
-        <option value="福利制度">福利制度</option>
-        <option value="其他">其他</option>
-      </select>
-
-      <label for="message">举报 / 意见内容</label>
-      <textarea id="message" name="message"
-        placeholder="请您如实填写宝贵的意见或举报内容，我们会认真核实并及时处理。"
-        maxlength="1500" required></textarea>
-
-      <label for="evidence">上传证据（可选，单个≤5MB，可多选）</label>
-      <input type="file" id="evidence" name="evidence" multiple accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.zip,.rar" />
-
-      <p>
-        <input type="checkbox" id="confirm" required />
-        我已知悉并确认：本表单不采集姓名、邮箱或登录信息。
-      </p>
-
-      <button type="submit" id="submitBtn">匿名提交</button>
-      <p id="status" style="margin-top: 15px; text-align: center;"></p>
-    </form>
-  </div>
-
-  <div class="footer">© 2025 联信资 版权所有</div>
-
-  <!-- EmailJS SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script>
-    (function() {
-      emailjs.init("Vf3g58_uwsuIfMxCI"); // ✅ Public Key
-    })();
-
-    const serviceID = "service_0nbyy1m";     // ✅ Service ID
-    const templateID = "template_la7d6sb";   // ✅ Template ID
-
-    const form = document.getElementById("feedbackForm");
-    const status = document.getElementById("status");
-    const btn = document.getElementById("submitBtn");
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      btn.disabled = true;
-      btn.textContent = "正在提交…";
-      status.textContent = "请稍候，正在上传与发送…";
-
-      const files = document.getElementById("evidence").files;
-      let uploadedUrls = [];
-
-      // ✅ 正确的 EmailJS Pro 文件上传接口
-      for (const file of files) {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("public_key", "Vf3g58_uwsuIfMxCI");
-        formData.append("service_id", "service_0nbyy1m");
-
-        try {
-          const res = await fetch("https://api.emailjs.com/api/v1.1/upload", {
-            method: "POST",
-            body: formData
-          });
-          const data = await res.json();
-          if (data && data.url) uploadedUrls.push(data.url);
-        } catch (err) {
-          console.error("文件上传失败：", err);
-        }
-      }
-
-      const params = {
-        category: form.category.value,
-        message: form.message.value,
-        evidence: uploadedUrls.length ? uploadedUrls.join("\n") : "无附件"
-      };
-
-      emailjs.send(serviceID, templateID, params)
-        .then(() => {
-          status.textContent = "✅ 举报已匿名提交成功！";
-          form.reset();
-        })
-        .catch((err) => {
-          console.error(err);
-          status.textContent = "❌ 提交失败，请稍后再试。";
-        })
-        .finally(() => {
-          btn.disabled = false;
-          btn.textContent = "匿名提交";
-        });
-    });
-  </script>
-</body>
-</html>
+:root{
+  --bg: #0f172a;
+  --card: #0b1220;
+  --muted: #94a3b8;
+  --text: #e2e8f0;
+  --accent: #3b82f6;
+  --accent-strong: #2563eb;
+  --border: #1e293b;
+  --danger: #ef4444;
+}
+*{ box-sizing: border-box; }
+body{
+  margin:0;
+  font-family: 'Noto Sans SC', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: radial-gradient(1200px 600px at 20% -10%, #1e3a8a33, transparent),
+              radial-gradient(800px 400px at 120% 0%, #22d3ee22, transparent),
+              var(--bg);
+  color: var(--text);
+}
+.page{ max-width: 860px; margin: 0 auto; padding: 40px 20px 80px; }
+.header{ text-align:center; margin-bottom: 22px; }
+.logo{ display:inline-flex; align-items:center; gap:12px; font-size: 22px; font-weight:700; letter-spacing: .5px; }
+.logo .shield{ width: 28px; height:28px; color: var(--accent); }
+.subtitle{ margin: 8px 0 0; color: var(--muted); font-size: 14px; }
+.card{
+  background: linear-gradient(180deg, #0b1220, #0a1020);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 15px 50px rgba(0,0,0,.35);
+}
+.field{ margin: 14px 0 18px; }
+.field label{ display:block; font-weight:600; margin-bottom:8px; }
+.field select,
+.field textarea,
+.field input[type="file"]{
+  width: 100%;
+  background: #0a1324;
+  color: var(--text);
+  border: 1px solid #22304a;
+  border-radius: 10px;
+  padding: 12px 14px;
+  outline: none;
+  transition: border .2s ease, box-shadow .2s ease;
+}
+.field textarea{ min-height: 140px; resize: vertical; }
+.field select:focus,
+.field textarea:focus{
+  border-color: #2a7fff;
+  box-shadow: 0 0 0 3px #2a7fff22;
+}
+.help-row{
+  display:flex; justify-content: space-between; align-items:center; margin-top:6px;
+  color: var(--muted); font-size: 12px;
+}
+.file-list{ margin: 8px 0 0; padding: 0 2px; list-style: none; color: var(--muted); font-size: 13px; }
+.file-list li{ padding: 4px 0; border-bottom: 1px dashed #20304a; }
+.file-list li:last-child{ border-bottom: none; }
+.checkbox label{ font-weight: 400; color: var(--muted); line-height: 1.5; }
+.checkbox input{ margin-right: 8px; }
+.submit{
+  width:100%; padding: 14px 16px; border-radius: 12px; border: 1px solid #1e3a8a;
+  background: linear-gradient(180deg, var(--accent), var(--accent-strong));
+  color:white; font-weight:700; letter-spacing: .5px;
+  cursor:pointer; transition: transform .03s ease, filter .2s ease, box-shadow .2s ease;
+  box-shadow: 0 8px 24px rgba(59,130,246,.35);
+}
+.submit:hover{ filter: brightness(1.05); }
+.submit:active{ transform: translateY(1px); }
+.tips{ color: var(--muted); font-size: 12px; margin-top: 12px; }
+.error{ color: var(--danger); min-height: 18px; display:block; }
+.footer{ text-align:center; margin-top: 18px; color: var(--muted); font-size: 12px; }
+body.thanks{
+  display:flex; align-items:center; justify-content:center; min-height:100vh; background: var(--bg);
+}
+.thanks-card{
+  width: min(460px, 90vw);
+  background: #0b1220; border: 1px solid var(--border); border-radius: 16px;
+  padding: 28px; text-align:center; box-shadow: 0 20px 60px rgba(0,0,0,.35);
+}
+.thanks-card .icon{ font-size: 42px; margin-bottom: 6px; }
+.thanks-card h1{ margin: 8px 0 8px; }
+.thanks-card p{ color: var(--muted); line-height: 1.7; }
+.thanks-card .back{
+  display:inline-block; margin-top: 18px; padding: 10px 16px; border-radius: 12px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-strong));
+  color:#fff; text-decoration:none; font-weight:700;
+}
 
 
 
